@@ -1,0 +1,44 @@
+Derpbird; An IRC bot inspired by 'douglbutt' and some #leaners.
+----
+
+Features:
+
+* Join multiple servers & channels.
+
+* Nickserv & channel passwords.
+
+* Re-joining on kick or disconnect.
+
+* Fetch Tweet via 'sup <username>' or 'http://twitter.com/...'
+
+----
+
+Requirements:
+
+* A working JVM.
+
+* A Maven install.
+
+----
+
+Config:
+
+You must have two configurations:
+
+* A Twitter config in: twitter4j.properties which contains:
+
+oauth.consumerKey=
+oauth.consumerSecret=
+oauth.accessToken=
+oauth.accessTokenSecret=
+
+See http://twitter4j.org/en/configuration.html for more details.
+
+* A bot configuration, see 'config.ini' for an example.
+
+----
+
+Compile & run:
+
+* mvn compile
+* ./run
