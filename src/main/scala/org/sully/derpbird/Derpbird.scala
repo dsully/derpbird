@@ -1,4 +1,4 @@
-package org.sully
+package org.sully.derpbird
 
 import java.io.IOException
 
