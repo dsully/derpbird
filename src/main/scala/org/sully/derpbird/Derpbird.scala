@@ -7,37 +7,24 @@ import collection.mutable.HashMap
 
 import twitter4j.{Status, TwitterException, TwitterFactory}
 
-import org.apache.commons.configuration.HierarchicalINIConfiguration
-
 import org.pircbotx.{MultiBotManager, PircBotX, UtilSSLSocketFactory}
 import org.pircbotx.exception.{IrcException, NickAlreadyInUseException}
 import org.pircbotx.hooks.{Listener, ListenerAdapter}
 import org.pircbotx.hooks.events._
 import org.pircbotx.hooks.managers.ThreadedListenerManager
-
-class MyINIConfiguration(filename: String) extends HierarchicalINIConfiguration(filename) {
-
-  // Override to not count '#' as a comment character.
-  val COMMENT_CHARS = ";"
-
-  // HierarchicalINIConfiguration doesn't actually split properly.
-  override def getStringArray(key: String): Array[String] = {
-
-    for (value:String <- getString(key).split(","))
-      yield value.trim
-  }
-}
+import grizzled.config.Configuration
+import io.Source
 
 class Derpbird[T <: PircBotX] extends ListenerAdapter[T] with Listener[T] {
 
-  var configs = new HashMap[String, HierarchicalINIConfiguration]
+  var configs = new HashMap[String, Configuration]
 
   // Regexes to match input from IRC.
   val sup_match = """^sup (.+)""".r
   val ext_match = """twitter.com/.+/statuses/(\d+)$""".r
 
   // Keep the config around so we can use it to rejoin channels on reconnect.
-  def addConfig(server: String, config: HierarchicalINIConfiguration) {
+  def addConfig(server: String, config: Configuration) {
     configs += server -> config
   }
 
@@ -46,14 +33,20 @@ class Derpbird[T <: PircBotX] extends ListenerAdapter[T] with Listener[T] {
     val server = event.getBot.getServer
     val config = configs.get((server)).get
 
-    for (channelSection <- config.getSection(server).getString("channels").split(",")) {
-      val channelConfig = config.getSection(channelSection.trim)
+    config.getAsList(server, "channels") match {
 
-      val channel  = channelConfig.getString("channel")
-      val password = channelConfig.getString("password", null)
+      case Some(List(channelName)) => {
 
-      println("Joining channel: " + channel + " on: " + server + ":" + event.getBot.getPort)
-      event.getBot.joinChannel(channel, password)
+        val channel  = config.get(channelName.trim, "channel").get
+        val password = config.getOrElse(channelName.trim, "password", "")
+
+        println("Joining channel: " + channel + " on: " + server + ":" + event.getBot.getPort)
+        event.getBot.joinChannel(channel, password)
+      }
+
+      case _ => {
+        println("No channels found in config!")
+      }
     }
   }
 
@@ -166,7 +159,12 @@ object Main {
     // Fire up the Actor that will send requests to Twitter.
     TwitterFetch.start()
 
-    val config   = new MyINIConfiguration(args(0))
+    // Allow # and . in section names. Allow ; in comments.
+    val validSection   = """([a-zA-Z0-9_\.#]+)""".r
+    val commentSection = """^\s*([;#].*)$""".r
+    val emptyMap       = Map.empty[String, Map[String, String]]
+
+    val config   = new Configuration(emptyMap, validSection, commentSection).load(Source.fromFile(args(0)))
     val multi    = new MultiBotManager("Derpbird")
     val manager  = new ThreadedListenerManager
     val listener = new Derpbird
@@ -177,28 +175,32 @@ object Main {
     multi.setEncoding("UTF-8")
     multi.setListenerManager(manager)
 
-    for (serverKey <- config.getStringArray("global.servers")) {
+    config.getAsList("global", "servers") match {
 
-      val server   = config.getSection(serverKey)
-      val host     = server.getString("host")
-      val port     = server.getInt("port", 6667)
-      val pass     = server.getString("password", null)
-      val socket   = if (server.getBoolean("ssl", false)) new UtilSSLSocketFactory else null
+      case Some(List(server)) => {
 
-      val bot      = multi.createBot(host, port, pass, socket)
+        val host     = config.get(server, "host")
+        val port     = config.getIntOrElse(server, "port", 6667)
+        val pass     = config.getOrElse(server, "password", "")
+        val socket   = if (config.getBooleanOrElse(server, "ssl", false)) new UtilSSLSocketFactory else null
 
-      bot.setName(server.getString("nick", "derpbird"))
-      bot.setLogin(server.getString("nick", "derpbird"))
-      bot.setFinger(server.getString("finger", "herp derp"))
-      bot.setVersion(server.getString("version", "Derpbird"))
-      bot.setVerbose(server.getBoolean("verbose", true))
+        val bot      = multi.createBot(host.get, port, pass, socket)
 
-      // My identification? You don't need to see my identification.
-      if (server.getString("nickpass", null) != null) {
-        bot.identify(server.getString("nickpass"))
+        bot.setName(config.getOrElse(server, "nick", "derpbird"))
+        bot.setLogin(config.getOrElse(server, "nick", "derpbird"))
+        bot.setFinger(config.getOrElse(server, "finger", "herp derp"))
+        bot.setVersion(config.getOrElse(server, "version", "Derpbird"))
+        bot.setVerbose(config.getBooleanOrElse(server, "verbose", true))
+
+        // My identification? You don't need to see my identification.
+        bot.identify(config.getOrElse(server, "nickpass", ""))
+
+        listener.addConfig(server, config)
       }
 
-      listener.addConfig(serverKey, config)
+      case _ => {
+        println("Server list is empty!")
+      }
     }
 
     try {

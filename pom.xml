@@ -32,15 +32,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.scala-tools</groupId>
-      <artifactId>maven-scala-plugin</artifactId>
-      <version>2.15.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-      <version>1.7</version>
+      <groupId>org.clapper</groupId>
+      <artifactId>grizzled-scala_2.9.0-1</artifactId>
+      <version>1.0.9</version>
     </dependency>
   </dependencies>
 
@@ -49,6 +43,7 @@
       <plugin>
        <groupId>org.scala-tools</groupId>
        <artifactId>maven-scala-plugin</artifactId>
+       <version>2.15.2</version>
        <executions>
          <execution>
            <goals>
@@ -66,15 +61,9 @@
 
   <repositories>
     <repository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
+      <id>scala-tools.org</id>
+      <name>Scala-tools Maven2 Repository</name>
+      <url>http://scala-tools.org/repo-releases</url>
     </repository>
   </repositories>
 
