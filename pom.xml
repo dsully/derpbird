@@ -7,9 +7,12 @@
   <groupId>org.sully</groupId>
   <artifactId>derpbird</artifactId>
   <version>1.0</version>
+  <packaging>jar</packaging>
 
   <properties>
     <scala.version>2.9.1</scala.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
   <dependencies>
@@ -33,7 +36,7 @@
 
     <dependency>
       <groupId>org.clapper</groupId>
-      <artifactId>grizzled-scala_2.9.0-1</artifactId>
+      <artifactId>grizzled-scala_${scala.version}</artifactId>
       <version>1.0.9</version>
     </dependency>
   </dependencies>
@@ -48,14 +51,54 @@
          <execution>
            <goals>
              <goal>compile</goal>
-             <goal>testCompile</goal>
            </goals>
          </execution>
        </executions>
        <configuration>
          <scalaVersion>${scala.version}</scalaVersion>
+         <charset>UTF-8</charset>
        </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.10</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.4</version>
+        <configuration>
+           <createDependencyReducedPom>true</createDependencyReducedPom>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>junit:junit</exclude>
+                </excludes>
+              </artifactSet>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>${project.groupId}.${project.artifactId}.Main</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

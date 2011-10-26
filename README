@@ -40,5 +40,5 @@ See http://twitter4j.org/en/configuration.html for more details.
 
 Compile & run:
 
-* mvn compile
+* mvn package
 * ./run

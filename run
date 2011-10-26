@@ -1,10 +1,4 @@
 #!/bin/bash
 
 # Derpbird launcher.
-
-if [ "$1x" == "x" ]; then
-  echo "Usage: $0 <config.ini>"
-  exit
-fi
-
-mvn scala:run -DmainClass=org.sully.derpbird.Main -DaddArgs=$1
+java -jar target/derpbird-1.0.jar $1

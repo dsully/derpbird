@@ -156,6 +156,8 @@ object Main {
       System.exit(1)
     }
 
+    println("Derpbird starting up..")
+
     // Fire up the Actor that will send requests to Twitter.
     TwitterFetch.start()
 
@@ -174,6 +176,8 @@ object Main {
 
     multi.setEncoding("UTF-8")
     multi.setListenerManager(manager)
+
+    println("Processing config.")
 
     config.getAsList("global", "servers") match {
 
@@ -202,6 +206,8 @@ object Main {
         println("Server list is empty!")
       }
     }
+
+    println("Connecting to IRC servers..")
 
     try {
       multi.connectAll()
