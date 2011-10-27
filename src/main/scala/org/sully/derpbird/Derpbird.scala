@@ -35,13 +35,16 @@ class Derpbird[T <: PircBotX] extends ListenerAdapter[T] with Listener[T] {
 
     config.getAsList(server, "channels") match {
 
-      case Some(List(channelName)) => {
+      case Some(names : List[String]) => {
 
-        val channel  = config.get(channelName.trim, "channel").get
-        val password = config.getOrElse(channelName.trim, "password", "")
+        for (channelName <- names) {
 
-        println("Joining channel: " + channel + " on: " + server + ":" + event.getBot.getPort)
-        event.getBot.joinChannel(channel, password)
+          val channel  = config.get(channelName.trim, "channel").get
+          val password = config.getOrElse(channelName.trim, "password", "")
+
+          println("Joining channel: " + channel + " on: " + server + ":" + event.getBot.getPort)
+          event.getBot.joinChannel(channel, password)
+        }
       }
 
       case _ => {
@@ -181,25 +184,29 @@ object Main {
 
     config.getAsList("global", "servers") match {
 
-      case Some(List(server)) => {
+      case Some(servers : List[String]) => {
 
-        val host     = config.get(server, "host")
-        val port     = config.getIntOrElse(server, "port", 6667)
-        val pass     = config.getOrElse(server, "password", "")
-        val socket   = if (config.getBooleanOrElse(server, "ssl", false)) new UtilSSLSocketFactory else null
+        for (server <- servers) {
+          println("Adding config for: " + server)
 
-        val bot      = multi.createBot(host.get, port, pass, socket)
+          val host     = config.get(server, "host")
+          val port     = config.getIntOrElse(server, "port", 6667)
+          val pass     = config.getOrElse(server, "password", "")
+          val socket   = if (config.getBooleanOrElse(server, "ssl", false)) new UtilSSLSocketFactory else null
 
-        bot.setName(config.getOrElse(server, "nick", "derpbird"))
-        bot.setLogin(config.getOrElse(server, "nick", "derpbird"))
-        bot.setFinger(config.getOrElse(server, "finger", "herp derp"))
-        bot.setVersion(config.getOrElse(server, "version", "Derpbird"))
-        bot.setVerbose(config.getBooleanOrElse(server, "verbose", true))
+          val bot      = multi.createBot(host.get, port, pass, socket)
 
-        // My identification? You don't need to see my identification.
-        bot.identify(config.getOrElse(server, "nickpass", ""))
+          bot.setName(config.getOrElse(server, "nick", "derpbird"))
+          bot.setLogin(config.getOrElse(server, "nick", "derpbird"))
+          bot.setFinger(config.getOrElse(server, "finger", "herp derp"))
+          bot.setVersion(config.getOrElse(server, "version", "Derpbird"))
+          bot.setVerbose(config.getBooleanOrElse(server, "verbose", true))
 
-        listener.addConfig(server, config)
+          // My identification? You don't need to see my identification.
+          bot.identify(config.getOrElse(server, "nickpass", ""))
+
+          listener.addConfig(server, config)
+        }
       }
 
       case _ => {
