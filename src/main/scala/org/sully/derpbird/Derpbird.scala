@@ -165,7 +165,7 @@ object Main {
     TwitterFetch.start()
 
     // Allow # and . in section names. Allow ; in comments.
-    val validSection   = """([a-zA-Z0-9_\.#]+)""".r
+    val validSection   = """([a-zA-Z0-9_\.\/#]+)""".r
     val commentSection = """^\s*([;#].*)$""".r
     val emptyMap       = Map.empty[String, Map[String, String]]
 
