@@ -20,8 +20,8 @@ class Derpbird[T <: PircBotX] extends ListenerAdapter[T] with Listener[T] {
   var configs = new HashMap[String, Configuration]
 
   // Regexes to match input from IRC.
-  val sup_match = """^sup (.+)""".r
-  val ext_match = """twitter.com/.+/statuses/(\d+)$""".r
+  val sup_match = """^sup\s+(\S+).*""".r
+  val ext_match = """.*twitter\.com/.+?/status?e?s/(\d+).*""".r
 
   // Keep the config around so we can use it to rejoin channels on reconnect.
   def addConfig(server: String, config: Configuration) {
