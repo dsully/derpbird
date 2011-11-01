@@ -120,8 +120,8 @@ object TwitterFetch extends Actor {
       event.getBot.sendMessage(event.getChannel, formatStatus(twitter.getUserTimeline(username).get(0)))
 
     } catch {
-      case te: TwitterException => {
-        println("Failed to get timeline: " + te.getMessage)
+      case e: Exception => {
+        println("Failed to get timeline: " + e.getMessage)
       }
     }
   }
@@ -131,8 +131,8 @@ object TwitterFetch extends Actor {
       event.getBot.sendMessage(event.getChannel, formatStatus(twitter.showStatus(id.toLong)))
 
     } catch {
-      case te: TwitterException => {
-        println("Failed to get timeline: " + te.getMessage)
+      case e: Exception => {
+        println("Failed to get timeline: " + e.getMessage)
       }
     }
   }
