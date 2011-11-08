@@ -113,7 +113,9 @@ object TwitterFetch extends Actor {
 
   val twitter = new TwitterFactory().getInstance
 
-  def formatStatus(status: Status) = "<" + status.getUser.getScreenName + "> " + status.getText
+  def formatStatus(status: Status) = {
+    "<" + status.getUser.getScreenName + "> " + status.getText.replaceAll("[\\r\\n]", " ")
+  }
 
   def fetchTimeLineForUser(event: MessageEvent[_ <: PircBotX], username: String) {
     try {
