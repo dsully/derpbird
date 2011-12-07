@@ -119,7 +119,7 @@ object TwitterFetch extends Actor {
 
   def fetchTimeLineForUser(event: MessageEvent[_ <: PircBotX], username: String) {
     try {
-      event.getBot.sendMessage(event.getChannel, formatStatus(twitter.getUserTimeline(username).get(0)))
+      event.getBot.sendNotice(event.getChannel, formatStatus(twitter.getUserTimeline(username).get(0)))
 
     } catch {
       case e: Exception => {
@@ -130,7 +130,7 @@ object TwitterFetch extends Actor {
 
   def fetchTweet(event: MessageEvent[_ <: PircBotX], id: String) {
     try {
-      event.getBot.sendMessage(event.getChannel, formatStatus(twitter.showStatus(id.toLong)))
+      event.getBot.sendNotice(event.getChannel, formatStatus(twitter.showStatus(id.toLong)))
 
     } catch {
       case e: Exception => {
