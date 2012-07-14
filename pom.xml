@@ -10,7 +10,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <scala.version>2.9.1</scala.version>
+    <scala.version>2.9.2</scala.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
@@ -19,7 +19,7 @@
     <dependency>
       <groupId>org.pircbotx</groupId>
       <artifactId>pircbotx</artifactId>
-      <version>1.6-SNAPSHOT</version>
+      <version>1.7</version>
     </dependency>
 
     <dependency>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>org.clapper</groupId>
       <artifactId>grizzled-scala_${scala.version}</artifactId>
-      <version>1.0.9</version>
+      <version>1.0.13</version>
     </dependency>
   </dependencies>
 
