@@ -21,7 +21,7 @@ class Derpbird[T <: PircBotX] extends ListenerAdapter[T] with Listener[T] {
 
   // Regexes to match input from IRC.
   val sup_match = """^sup\s+(\S+).*""".r
-  val ext_match = """.*twitter\.com/.+?/status?e?s/(\d+).*""".r
+  val ext_match = """.*twitter\.com/.+?/status?e?s/(\d+)/?$""".r
 
   // Keep the config around so we can use it to rejoin channels on reconnect.
   def addConfig(server: String, config: Configuration) {
@@ -91,7 +91,8 @@ class Derpbird[T <: PircBotX] extends ListenerAdapter[T] with Listener[T] {
 
     try {
 
-      event.getMessage match {
+      // Strip trailing white space before matching.
+      event.getMessage.trim match {
         case sup_match(username) => TwitterFetch ! TwitterMessageFetchForUser(event, username)
         case ext_match(tweetId)  => TwitterFetch ! TwitterMessageFetchForId(event, tweetId)
         case _ => null
